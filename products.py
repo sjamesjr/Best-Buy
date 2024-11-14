@@ -1,6 +1,6 @@
 class Product:
 
-    def __init__(self, name, price, quantity):
+    def __init__(self, name: str, price: float, quantity: int):
         self.name = name
         self.price = price
         self.quantity = quantity
@@ -9,7 +9,7 @@ class Product:
     def get_quantity(self):
         """Getter function for quantity.
            Returns the quantity (float)."""
-        return float(self.quantity)
+        return self.quantity
 
     def set_quantity(self, quantity):
         """Setter function for quantity. If quantity reaches 0, deactivates the product.
@@ -62,15 +62,15 @@ class Product:
 
         return total_price
 
-bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
-mac = Product("MacBook Air M2", price=1450, quantity=100)
+# bose = Product("Bose QuietComfort Earbuds", 250, 500)
+# mac = Product("MacBook Air M2", 1450, 100)
 
-print(bose.buy(50))
-print(mac.buy(100))
-print(mac.is_active())
-
-bose.show()
-mac.show()
-
-bose.set_quantity(1000)
-bose.show()
+# print(bose.buy(50))
+# print(mac.buy(100))
+# print(mac.is_active())
+#
+# bose.show()
+# mac.show()
+#
+# bose.set_quantity(1000)
+# bose.show()
