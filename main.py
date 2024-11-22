@@ -15,6 +15,16 @@ def start(store_class):
     3. Make an order by selecting products and quantities.
     4. Quit the program.
     """
+    # Setup initial stock of inventory
+    product_list = [
+        products.Product("MacBook Air M2", 1450, 100),
+        products.Product("Bose QuietComfort Earbuds", 250, 500),
+        products.Product("Google Pixel 7", 500, 250)
+    ]
+
+    # Create an instance of the store with the initial products
+    best_buy = store_class(product_list)
+
     while True:
         # Display the store menu options
         print("Store Menu")
@@ -29,16 +39,6 @@ def start(store_class):
         except ValueError:
             print("Invalid input! Please enter a number between 1 and 4.")
             continue
-
-        # Setup initial stock of inventory
-        product_list = [
-            products.Product("MacBook Air M2", 1450, 100),
-            products.Product("Bose QuietComfort Earbuds", 250, 500),
-            products.Product("Google Pixel 7", 500, 250)
-        ]
-
-        # Create an instance of the store with the initial products
-        best_buy = store_class(product_list)
 
         # Handle menu options
         if menu_input == 1:
@@ -82,6 +82,7 @@ def start(store_class):
                     # Add the chosen product and quantity to the shopping list
                     chosen_product = best_buy.get_all_products()[product_ordered - 1]
                     shopping_list.append((chosen_product, order_quantity))
+                    # Subtract the chosen product from the product list
                 except ValueError:
                     print("Invalid input! Please enter a valid product number and quantity.")
                     continue
