@@ -1,4 +1,4 @@
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 
 
 class Store:
@@ -80,13 +80,23 @@ class Store:
         """
         total_cost = 0.0
         for product, quantity_needed in shopping_list:
-            # Check if the product is in the store and has sufficient quantity
-            if product in self.product_list and product.quantity >= quantity_needed:
-                # Reduce the quantity of the product
-                product.quantity -= quantity_needed
-                # Add the cost of the product to the total cost
-                total_cost += product.price * quantity_needed
-            else:
-                # Raise an exception if there's insufficient quantity
-                raise ValueError(f"Insufficient quantity for product: {product.name}")
+            if product in self.product_list:
+                if isinstance(product, NonStockedProduct):
+                    total_cost += product.price * quantity_needed
+                # Check if the product is in the store and has sufficient quantity
+                elif isinstance(product, LimitedProduct):
+                    if quantity_needed > product.maximum:
+                        raise Exception(f"Limited product, max {product.maximum} per order")
+                    if product.quantity >= quantity_needed:
+                        product.quantity -= quantity_needed
+                        total_cost += product.price * quantity_needed
+
+                elif product in self.product_list and product.quantity >= quantity_needed:
+                    # Reduce the quantity of the product
+                    product.quantity -= quantity_needed
+                    # Add the cost of the product to the total cost
+                    total_cost += product.price * quantity_needed
+                else:
+                    # Raise an exception if there's insufficient quantity
+                    raise ValueError(f"Insufficient quantity for product: {product.name}")
         return total_cost

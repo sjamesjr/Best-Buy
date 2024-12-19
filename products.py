@@ -117,4 +117,27 @@ class Product:
         return total_price
 
 
+class NonStockedProduct(Product):
+    def __init__(self, name: str, price: float):
+        super().__init__(name, price, quantity=0)
+        self.active = True
+
+    def show(self):
+        return f"{self.name}, Price: ${self.price}. (Non Stocked Product. Always available)"
+
+
+class LimitedProduct(Product):
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
+        super().__init__(name, price, quantity)
+        self.maximum = maximum
+
+    def show(self):
+        return (f"{self.name}, Price: ${self.price}, Stock: {self.quantity}"
+                f"Limited product, max {self.maximum} per order")
+
+    def buy(self, quantity: int):
+
+        if self.quantity > self.maximum:
+            raise Exception(f"Only {self.maximum} available per order")
+        return super().buy(quantity)
 
