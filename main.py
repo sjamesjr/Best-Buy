@@ -1,4 +1,5 @@
 import products
+import promotions
 from store import Store
 
 
@@ -15,15 +16,7 @@ def start(store_class):
     3. Make an order by selecting products and quantities.
     4. Quit the program.
     """
-    # Setup initial stock of inventory
-    # product_list = [
-    #     products.Product("MacBook Air M2", 1450, 100),
-    #     products.Product("Bose QuietComfort Earbuds", 250, 500),
-    #     products.Product("Google Pixel 7", 500, 250)
-    # ]
-    #
-    # # Create an instance of the store with the initial products
-    # best_buy = store_class(product_list)
+
     # setup initial stock of inventory
     product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                     products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
@@ -31,7 +24,17 @@ def start(store_class):
                     products.NonStockedProduct("Windows License", price=125),
                     products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                     ]
-    best_buy =  Store(product_list)
+
+    # Create promotion catalog
+    second_half_price = promotions.SecondHalfPrice("Second Half price!")
+    third_one_free = promotions.ThirdOneFree("Third One Free!")
+    thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    product_list[0].set_promotion(second_half_price)
+    product_list[1].set_promotion(third_one_free)
+    product_list[3].set_promotion(thirty_percent)
+    best_buy = Store(product_list)
 
     while True:
         # Display the store menu options
@@ -113,5 +116,3 @@ def start(store_class):
 
 # Run the program
 start(Store)
-
-

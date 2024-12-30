@@ -1,3 +1,6 @@
+from promotions import Promotion
+
+
 class Product:
     """
     A class to represent a product in the store.
@@ -30,6 +33,7 @@ class Product:
         self.name = name
         self.price = price
         self.quantity = quantity
+        self.promotion = None
         self.active = True  # Products are active by default
 
     def get_quantity(self):
@@ -74,6 +78,12 @@ class Product:
         """
         self.active = False
 
+    def get_promotion(self):
+        return self.promotion
+
+    def set_promotion(self, promotion: Promotion):
+        self.promotion = promotion
+
     def show(self):
         """
         Displays product details as a formatted string.
@@ -81,7 +91,7 @@ class Product:
         Returns:
             str: A string representation of the product.
         """
-        print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}")
+        print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}, Promotion: {self.promotion}")
 
     def buy(self, quantity: int):
         """
@@ -103,9 +113,17 @@ class Product:
         # Check if there's enough quantity to fulfill the order
         if quantity > self.quantity:
             raise Exception("Insufficient quantity available.")
+        # Debug: Check if promotion is applied
+        print(f"Product: {self.name}, Promotion: {self.promotion.name if self.promotion else 'No promotion'}")
 
         # Calculate the total price
         total_price = self.price * quantity
+        # Calculate the total price using the promotion if it exists
+        if self.promotion:
+            print(f"Applying promotion '{self.promotion.name}' to {self.name}")
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
 
         # Update the quantity after purchase
         self.quantity -= quantity
@@ -136,8 +154,6 @@ class LimitedProduct(Product):
                 f"Limited product, max {self.maximum} per order")
 
     def buy(self, quantity: int):
-
         if self.quantity > self.maximum:
             raise Exception(f"Only {self.maximum} available per order")
         return super().buy(quantity)
-
