@@ -65,7 +65,8 @@ class Store:
 
     def order(self, shopping_list):
         """
-        Processes a shopping list and returns the total cost of the order.
+        Processes a shopping list and returns the total cost of the order,
+        with options to retry or adjust the order in case of errors.
 
         Args:
             shopping_list (list): A list of tuples where each tuple contains:
@@ -74,29 +75,76 @@ class Store:
 
         Returns:
             float: The total cost of the order.
-
-        Raises:
-            ValueError: If the quantity needed exceeds the available stock of a product.
         """
         total_cost = 0.0
-        for product, quantity_needed in shopping_list:
-            if product in self.product_list:
+        idx = 0  # Index to track current product in shopping list
+
+        while idx < len(shopping_list):
+            product, quantity_needed = shopping_list[idx]
+
+            try:
+                # Process NonStockedProduct
                 if isinstance(product, NonStockedProduct):
                     total_cost += product.price * quantity_needed
-                # Check if the product is in the store and has sufficient quantity
+                    idx += 1  # Move to next product
+                    continue
+
+                # Process LimitedProduct
                 elif isinstance(product, LimitedProduct):
                     if quantity_needed > product.maximum:
-                        raise Exception(f"Limited product, max {product.maximum} per order")
-                    if product.quantity >= quantity_needed:
-                        product.quantity -= quantity_needed
-                        total_cost += product.price * quantity_needed
+                        raise Exception(f"{product.name} is limited to {product.maximum} per order.")
+                    if quantity_needed > product.quantity:
+                        raise Exception(f"Insufficient stock for {product.name}. Available: {product.quantity}")
+                    total_cost += product.buy(quantity_needed)
+                    idx += 1  # Move to next product
+                    continue
 
-                elif product in self.product_list and product.quantity >= quantity_needed:
-                    # Reduce the quantity of the product
-                    product.quantity -= quantity_needed
-                    # Add the cost of the product to the total cost
-                    total_cost += product.price * quantity_needed
+                # Process regular Product
+                elif isinstance(product, Product):
+                    if quantity_needed > product.quantity:
+                        raise Exception(f"Insufficient stock for {product.name}. Available: {product.quantity}")
+                    total_cost += product.buy(quantity_needed)
+                    idx += 1  # Move to next product
+                    continue
+
                 else:
-                    # Raise an exception if there's insufficient quantity
-                    raise ValueError(f"Insufficient quantity for product: {product.name}")
+                    raise Exception(f"Unknown product type: {product.__class__.__name__}")
+
+            except Exception as e:
+                print(f"Error processing product {product.name}: {e}")
+
+                # Provide retry or skip options
+                print("Options:")
+                print("1. Retry with a different quantity")
+                print("2. Skip this product")
+                user_choice = input("Choose an option (1/2): ")
+
+                if user_choice == "1":
+                    try:
+                        # Get new quantity from user
+                        new_quantity = input(f"Enter a new quantity for {product.name}: ").strip()
+                        if not new_quantity.isdigit() or int(new_quantity) <= 0:
+                            print("Invalid quantity. Skipping product.")
+                            idx += 1  # Move to next product
+                            continue
+
+                        # Update shopping list and retry
+                        shopping_list[idx] = (product, int(new_quantity))
+                        continue  # Retry with updated quantity
+
+                    except ValueError:
+                        print("Invalid input. Skipping product.")
+                        idx += 1  # Move to next product
+                        continue
+
+                elif user_choice == "2":
+                    print(f"Skipping {product.name}.")
+                    idx += 1  # Move to next product
+                    continue
+
+                else:
+                    print("Invalid choice. Skipping product.")
+                    idx += 1  # Move to next product
+                    continue
+
         return total_cost
