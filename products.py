@@ -154,6 +154,6 @@ class LimitedProduct(Product):
                 f"Limited product, max {self.maximum} per order")
 
     def buy(self, quantity: int):
-        if self.quantity > self.maximum:
+        if quantity > self.maximum:
             raise Exception(f"Only {self.maximum} available per order")
         return super().buy(quantity)
