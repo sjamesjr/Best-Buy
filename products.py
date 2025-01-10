@@ -30,11 +30,16 @@ class Product:
             price (float): The price of the product.
             quantity (int): The initial stock quantity of the product.
         """
+
+        if name == "" or price < 0 or quantity < 0:
+            raise ValueError("Invalid product details")
         self.name = name
         self.price = price
         self.quantity = quantity
         self.promotion = None
         self.active = True  # Products are active by default
+
+
 
     def get_quantity(self):
         """
